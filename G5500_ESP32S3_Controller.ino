@@ -1,5 +1,5 @@
 /*
-  G5500 ESP32-S3 Controller v1.5.48 NO BLE
+  G5500 ESP32-S3 Controller v1.5.49 NO BLE
   Copyright (c) UA1CFM
   Added:
     - PSTROTATOR / Yaesu GS-232B serial command handling
@@ -416,7 +416,7 @@ static void handlePstRotatorSerial(){
 
 
 static void updatePosition(){
-  // Working measurement path in v1.5.48:
+  // Working measurement path in v1.5.49:
   // factory-calibrated ESP32-S3 millivolts -> our mechanical calibration -> angle.
   int az=adcAvgMv(PIN_AZ_ADC), el=adcAvgMv(PIN_EL_ADC);
 
@@ -491,7 +491,8 @@ static void setReferenceTarget(float az,float el,bool setAz,bool setEl){
 
 static void moveDir(char d){
   // Match LVBTrack.c more closely:
-  // manual AZ cancels AZ tracking only; manual EL cancels EL tracking only.
+  // manual AZ cancels only AZ tracking; manual EL cancels only EL tracking.
+  // The other axis may continue its automatic movement.
   if(d=='L'){
     azTrack=false;
     digitalWrite(PIN_RIGHT,LOW);
@@ -620,7 +621,7 @@ static void loadPrefs(){
   wifiSsid=prefs.getString("ssid","");
   wifiPass=prefs.getString("pass","");
 
-  // v1.5.48 calibration format:
+  // v1.5.49 calibration format:
   // 0/1 = legacy RAW ADC calibration (do not reuse as mV)
   // 2   = calibrated millivolts from analogReadMilliVolts()
   uint8_t calFmt=prefs.getUChar("calfmt",0);
@@ -688,7 +689,7 @@ static void saveWifi(String s,String p){
 static const char WEB_PAGE[] PROGMEM = R"HTML(
 <!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>G5500 Controller v1.5.48 - UA1CFM</title>
+<title>G5500 Controller v1.5.49 - UA1CFM</title>
 <style>
 :root{--bg:#081018;--p:#111d28;--p2:#162635;--t:#f4f7fa;--m:#96a9b7;--a:#24d18d;--s:#e74c3c;--b:#2b4557}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#081018,#0b1721);color:var(--t);font-family:Arial,sans-serif}
@@ -714,7 +715,7 @@ static const char WEB_PAGE[] PROGMEM = R"HTML(
 .calreset{background:#9b2c2c;min-height:46px;font-size:15px;padding:8px 12px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.big{font-size:46px}.targetbig{font-size:30px}.sep{font-size:26px}}
 </style></head><body><div class="wrap">
-<div style="font-size:13px;color:#96a9b7;margin:2px 0 6px">G5500 Controller v1.5.48 &copy; UA1CFM</div>
+<div style="font-size:13px;color:#96a9b7;margin:2px 0 6px">G5500 Controller v1.5.49 &copy; UA1CFM</div>
 <h1>YAESU G-5500 / ESP32-S3</h1>
 <div class="grid">
 <div class="card"><div class="label">Азимут — текущее / задание</div><div><span id="az" class="big">--.-</span><span class="sep"> / </span><span id="azt" class="targetbig">---</span><span class="unit">°</span></div><div class="bar"><div id="azbar" class="fill"></div></div><div>0° <span style="float:right">450°</span></div></div>
@@ -876,7 +877,7 @@ document.querySelectorAll('.movebtn').forEach(function(b){
 static const char ADC_TEST_PAGE[] PROGMEM = R"HTML(
 <!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>G5500 ADC TEST v1.5.48</title>
+<title>G5500 ADC TEST v1.5.49</title>
 <style>
 :root{--bg:#081018;--p:#111d28;--t:#f4f7fa;--m:#96a9b7;--a:#24d18d;--b:#2b4557;--az:#33b8ff;--el:#ffb347}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#081018,#0b1721);color:var(--t);font-family:Arial,sans-serif}
@@ -890,7 +891,7 @@ canvas{width:100%;height:360px;background:#071018;border-radius:10px;margin-top:
 a{color:#24d18d;text-decoration:none;font-weight:700}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
-<div class="muted" style="font-size:13px">G5500 Controller v1.5.48 &copy; UA1CFM</div>
+<div class="muted" style="font-size:13px">G5500 Controller v1.5.49 &copy; UA1CFM</div>
 <h1>ADC TEST — ESP32-S3</h1>
 <div><a href="/">← Вернуться к управлению G5500</a></div>
 
@@ -986,7 +987,7 @@ setInterval(upd,350);upd();draw();
 static const char RESET_DIAG_PAGE[] PROGMEM = R"HTML(
 <!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>G5500 RESET DIAG v1.5.48</title>
+<title>G5500 RESET DIAG v1.5.49</title>
 <style>
 :root{--bg:#081018;--p:#111d28;--t:#f4f7fa;--m:#96a9b7;--a:#24d18d;--b:#2b4557;--w:#e5a94f;--red:#d9534f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#081018,#0b1721);color:var(--t);font-family:Arial,sans-serif}
@@ -1003,7 +1004,7 @@ th{color:var(--m);font-weight:700}
 .danger{background:#8f2e2b;color:#fff}
 @media(max-width:650px){.kv{grid-template-columns:1fr}.reason{font-size:32px}th,td{font-size:12px;padding:7px 4px}}
 </style></head><body><div class="wrap">
-<div class="muted" style="font-size:13px">G5500 Controller v1.5.48 &copy; UA1CFM</div>
+<div class="muted" style="font-size:13px">G5500 Controller v1.5.49 &copy; UA1CFM</div>
 <h1>RESET DIAG</h1>
 <div><a href="/">← Вернуться к управлению G5500</a> &nbsp;&nbsp; <a href="/adc">ADC TEST →</a></div>
 
@@ -1397,6 +1398,12 @@ static void processRotctldCommand(String cmd){
   if(isSet){
     float az=0, el=0;
     String args = cmd.substring(valueStart);
+
+    // R4UAB DDE Client sends decimal values using the Windows locale,
+    // e.g. "P 187,30 22,40".  sscanf("%f") expects a decimal point in
+    // the C locale, so normalize decimal commas before parsing.
+    args.replace(',', '.');
+
     if(sscanf(args.c_str(),"%f %f",&az,&el)==2){
       setReferenceTarget(clampf(az,0,450),clampf(el,0,180),true,true);
       lastTargetCommandMs=millis(); lastTargetRxMs=millis();
@@ -1433,7 +1440,7 @@ static void processRotctldCommand(String cmd){
 
   // Minimal info support.
   if(cmd=="_" || lower=="\\get_info" || lower=="get_info"){
-    rotctldSend("G5500 ESP32-S3 v1.5.48 UA1CFM Look4Sat bridge\n");
+    rotctldSend("G5500 ESP32-S3 v1.5.49 UA1CFM Look4Sat bridge\n");
     return;
   }
 
@@ -1507,17 +1514,17 @@ static void startWifi(){
   delay(300);
 
 #if ARDUINO_USB_MODE
-  dbgPrintln("[V1548] AP-only start");
-  dbgPrint("[V1548] AP start = ");
+  dbgPrintln("[V1549] AP-only start");
+  dbgPrint("[V1549] AP start = ");
   dbgPrintln(apOk ? "OK" : "FAILED");
-  dbgPrint("[V1548] AP IP = ");
+  dbgPrint("[V1549] AP IP = ");
   dbgPrintln(WiFi.softAPIP().toString());
 #endif
 
   // Try home Wi-Fi once, only if credentials are stored.
   if(wifiSsid.length()){
 #if ARDUINO_USB_MODE
-    dbgPrint("[V1548] one STA attempt: ");
+    dbgPrint("[V1549] one STA attempt: ");
     dbgPrintln(wifiSsid);
 #endif
 
@@ -1532,9 +1539,9 @@ static void startWifi(){
 
     if(WiFi.status()==WL_CONNECTED){
 #if ARDUINO_USB_MODE
-      dbgPrint("[V1548] LAN connected = ");
+      dbgPrint("[V1549] LAN connected = ");
       dbgPrintln(WiFi.localIP().toString());
-      dbgPrint("[V1548] AP remains = ");
+      dbgPrint("[V1549] AP remains = ");
       dbgPrintln(WiFi.softAPIP().toString());
 #endif
     }else{
@@ -1549,14 +1556,14 @@ static void startWifi(){
       delay(250);
 
 #if ARDUINO_USB_MODE
-      dbgPrintln("[V1548] LAN unavailable -> AP ONLY");
-      dbgPrint("[V1548] AP restored = ");
+      dbgPrintln("[V1549] LAN unavailable -> AP ONLY");
+      dbgPrint("[V1549] AP restored = ");
       dbgPrintln(WiFi.softAPIP().toString());
 #endif
     }
   }else{
 #if ARDUINO_USB_MODE
-    dbgPrintln("[V1548] no saved LAN credentials -> AP ONLY");
+    dbgPrintln("[V1549] no saved LAN credentials -> AP ONLY");
 #endif
   }
 
@@ -1595,7 +1602,7 @@ void setup(){
   bootResetReason = esp_reset_reason();
   bootResetReasonText = resetReasonToText(bootResetReason);
 
-  // Preload relay-control GPIO latches LOW before enabling OUTPUT mode.
+  // Preload output latches LOW before enabling output mode to reduce relay glitches at boot.
   digitalWrite(PIN_LEFT,LOW);
   digitalWrite(PIN_RIGHT,LOW);
   digitalWrite(PIN_UP,LOW);
@@ -1620,16 +1627,16 @@ void setup(){
   lcd.setCursor(0,0);
   lcd.print("G5500 ESP32-S3");
   lcd.setCursor(0,1);
-  lcd.print("(c)UA1CFM 1.5.48");
+  lcd.print("(c)UA1CFM 1.5.49");
   loadPrefs();
   initRssiHistory();
 
   dbgPrintln("");
-  dbgPrintln("######## FIRMWARE v1.5.48 NO BLE ########");
+  dbgPrintln("######## FIRMWARE v1.5.49 NO BLE ########");
   dbgPrint("[RESET REASON] "); dbgPrintln(bootResetReasonText);
   dbgPrint("[RESET CODE] "); dbgPrintln(String((int)bootResetReason));
-  dbgPrintln("[V1548] USB debug alive");
-  dbgPrintln("[V1548] BLE disabled - Flash/RAM saving");
+  dbgPrintln("[V1549] USB debug alive");
+  dbgPrintln("[V1549] BLE disabled - Flash/RAM saving");
 startWifi();
 
   bool timeOk=syncClockFromNtp();
@@ -1637,17 +1644,20 @@ startWifi();
   dbgPrint("[TIME SYNC] "); dbgPrintln(timeOk ? "NTP OK" : "NO NTP - history entry has no exact time");
 
   dbgPrintln("");
-  dbgPrintln("=== G5500 ESP32-S3 v1.5.48 ===");
+  dbgPrintln("=== G5500 ESP32-S3 v1.5.49 ===");
   dbgPrintln("Copyright (c) UA1CFM");
   dbgPrintln("UART0 USB: PSTROTATOR GS-232, 9600 baud (COM number assigned by Windows)");
   dbgPrintln("Native USB Serial/JTAG: diagnostics + programming (COM number assigned by Windows)");
   dbgPrintln("TCP 4533: Look4Sat/Hamlib + GS-232B full command set");
+  dbgPrintln("R4UAB DDE Client TCP: decimal comma accepted in Hamlib P az el command");
   dbgPrintln("RSSI history: 1h/1d/1w/1m/1y, year saved daily");
   dbgPrintln("Reset history: last 20 boots stored in NVS with NTP UTC time when available");
   dbgPrintln("Target control: LVBTrack-style; STOP halts motion, next target starts again");
-  dbgPrintln("Manual control: cancels tracking only on the manually moved axis");
-  dbgPrintln("ADC averaging: 25 samples, matching LVBTrack.c smoothing depth");
+  dbgPrintln("Manual control: cancels current axis tracking; next target starts automatically");
   dbgPrintln("Calibration: AZ 6-point / EL 5-point piecewise linear");
+  dbgPrintln("ADC averaging: 25 samples, matching LVBTrack smoothing depth");
+  dbgPrintln("Manual axis behavior: AZ manual cancels AZ track only; EL manual cancels EL track only");
+  dbgPrintln("Boot outputs: LOW preloaded before pinMode(OUTPUT)");
   dbgPrintln("Web calibration: live AZ/EL duplicated beside calibration buttons");
   dbgPrintln("Web calibration menu: collapsible, default closed");
   dbgPrintln("Calibration buttons: saved points highlighted in green");
@@ -1655,7 +1665,7 @@ startWifi();
   dbgPrintln("Rotator movement: LVBTrack.c reference algorithm, no added hysteresis or hold logic");
   dbgPrintln("Web main cards: current / target shown inline for AZ and EL");
   dbgPrintln("LCD: integer AZ/EL with commanded target in parentheses");
-  dbgPrintln("LCD startup: (c)UA1CFM 1.5.48 shown on second line");
+  dbgPrintln("LCD startup: (c)UA1CFM 1.5.49 shown on second line");
   dbgPrint("[WiFi AP]  ");
   dbgPrintln(WiFi.softAPIP().toString());
   if(WiFi.status()==WL_CONNECTED){
